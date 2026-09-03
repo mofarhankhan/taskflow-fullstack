@@ -1,4 +1,5 @@
-const API = "http://localhost:5000/api";
+// const API = "http://localhost:5000/api";
+const API = "http://13.207.195.86:5000/api";
 export async function request(path, options = {}) {
   const token = localStorage.getItem("token");
   const res = await fetch(API + path, {
