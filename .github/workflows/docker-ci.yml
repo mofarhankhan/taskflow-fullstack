@@ -1,8 +1,9 @@
-name: Taskflow CI
+name: Taskflow CI/CD
 
 on:
   push:
     branches: main
+
 permissions:
   contents: read
 
@@ -40,3 +41,24 @@ jobs:
           tags: |
             mofarhankhann/taskflow-backend:${{ github.sha }}
             mofarhankhann/taskflow-backend:latest
+
+      - name: Deploy TO EC2
+        uses: appleboy/ssh-action@v1.2.2
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USERNAME }}
+          key: ${{ secrets.EC2_SSH_KEY }}
+          script: |
+            cd ~/PROJECTS/taskflow-fullstack
+
+            echo "Pulling latest Docker images...."
+            docker compose pull
+
+            echo "Deploying Application...."
+            docker compose up -d
+
+            echo "Cleaning unused Docker images...."
+            docker image prune -f
+
+            echo "Deployment Completed!"
+            docker ps

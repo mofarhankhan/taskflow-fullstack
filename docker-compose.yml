@@ -22,7 +22,7 @@ services:
       retries: 10
 
   backend:
-    image: taskflow-backend:1.0
+    image: mofarhankhann/taskflow-backend:latest
     container_name: taskflow-backend
     restart: unless-stopped
 
@@ -43,7 +43,7 @@ services:
 
 
   frontend:
-    image: taskflow-frontend:1.0
+    image: mofarhankhann/taskflow-frontend:latest
     container_name: taskflow-frontend
     restart: unless-stopped
 
