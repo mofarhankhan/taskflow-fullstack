@@ -1,0 +1,57 @@
+services:
+
+  mysql:
+    image: mysql:8.0
+    container_name: taskflow-mysql
+    restart: unless-stopped
+
+    environment:
+      MYSQL_ROOT_PASSWORD: TaskflowDB@123
+      MYSQL_DATABASE: taskflow
+      MYSQL_USER: taskflow_user
+      MYSQL_PASSWORD: TaskflowDB@123
+
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./database/schema.sql:/docker-entrypoint-initdb.d/schema.sql:ro
+
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-pTaskflowDB@123"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  backend:
+    image: taskflow-backend:1.0
+    container_name: taskflow-backend
+    restart: unless-stopped
+
+    environment:
+      PORT: 5000
+      DB_HOST: mysql
+      DB_USER: taskflow_user
+      DB_PASSWORD: TaskflowDB@123
+      DB_NAME: taskflow
+      JWT_SECRET: change_this_jwt_secret
+
+    depends_on:
+      mysql:
+        condition: service_healthy
+
+    ports:
+      - "5000:5000"
+
+
+  frontend:
+    image: taskflow-frontend:1.0
+    container_name: taskflow-frontend
+    restart: unless-stopped
+
+    depends_on:
+      - backend
+
+    ports:
+      - "80:80"
+
+volumes:
+  mysql_data:
